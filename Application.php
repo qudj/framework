@@ -2,7 +2,7 @@
 error_reporting(E_ALL || ~E_NOTICE);
 include("./framework/common/common.php");
 include("./framework/extra/smarty/Smarty.class.php");
-
+ 
 class Application
 {
     private static $instance = NULL;
@@ -65,4 +65,5 @@ class Application
         return false;
     }
 
-} 
+}
+
