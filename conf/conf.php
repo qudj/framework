@@ -36,6 +36,11 @@ $___global_config = array(
             'login' => 'root',
             'password' => '123456',
         ),
-	);
+    
+        "sphinx" => array(
+            'host' => 'localhost',
+            'port' => 9312,
+        ),
+);
 
 return $___global_config;

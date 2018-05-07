@@ -223,7 +223,7 @@ class Amqp{
         if($queue === null) {
             throw new Exception("cann't find queue for $key in " . __FILE__);
         }
-
+        
         $queue->consume(function($envelope, $q) use (&$times, $begin, $callback, $options) {
             $errorHandler = isset($options['error_handler']) ? $options['error_handler'] : '';
             $maxTimes = isset($options['max_times']) ? (int) $options['max_times'] : 0;
@@ -246,22 +246,16 @@ class Amqp{
             try {
                 //返回 false, 按照 官方 consume 返回值处理机制， 正常退出，其他情况，不退出
                 $result = $callback($key, $data);
-                $q->ack($envelope->getDeliveryTag());
-                return $result;
-            //明确异常退出，将消息放回队列，并且退出进程
+                if($result){
+                    $q->ack($envelope->getDeliveryTag());
+                }else{
+                    $q->nack($envelope->getDeliveryTag(), AMQP_REQUEUE);
+                }
+                return true;
+            //明确异常，将消息放回队列，不退出进程
             } catch (Exception $e) {
                 $q->nack($envelope->getDeliveryTag(), AMQP_REQUEUE);
-                if($errorHandler && is_callable($errorHandler)) {
-                    $errorHandler($key, $e);
-                }
-                return false;
-            //抛出其他异常，将消息放回队列，不退出进程
-            } catch (Exception $e) {
-                $q->nack($envelope->getDeliveryTag(), AMQP_REQUEUE);
-
-                if($errorHandler && is_callable($errorHandler)) {
-                    $errorHandler($key, $e);
-                }
+                Logger::ERR("AMQP", ['ex'=>$e->getMessage()]);
                 return true;
             }
         });

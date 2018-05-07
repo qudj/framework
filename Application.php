@@ -1,5 +1,6 @@
 <?php
 error_reporting(E_ALL || ~E_NOTICE);
+ini_set('display_errors',1);
 include("./framework/common/common.php");
 include("./framework/extra/smarty/Smarty.class.php");
  
@@ -30,7 +31,6 @@ class Application
                 echo "项目创建未成功！";exit;
             }
         }else{
-            //echo 333;die;
             if(!defined('__APPNAME__')) {
                 define('__APPNAME__',$appname);
             }
